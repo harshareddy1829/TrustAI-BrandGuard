@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TrustAI BrandGuard</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+/* Layout concept: a black, editorial company site. One column of sections, a wide live-check panel, and a single teal accent used sparingly. */
+:root {
+  --bg: #000000;
+  --surface: #0c0c0e;
+  --surface-2: #151518;
+  --ink: #f3f4f6;
+  --ink-2: #c4c7cd;
+  --ink-3: #8d929b;
+  --rule: #26262b;
+  --accent: #2dd4bf;
+  --accent-ink: #00201c;
+  --flag: #ff6b6b;
+  --flag-bg: #3a1212;
+  --warn: #fbbf24;
+  --warn-bg: #352700;
+  --ok: #34d399;
+  --display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: hidden;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+.container { max-width: 1120px; margin: 0 auto; }
+section { padding-block: clamp(56px, 8vw, 96px); border-top: 1px solid var(--rule); }
+.kicker { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; color: var(--ink); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(36px, 5.2vw, 58px); line-height: 1.06; letter-spacing: -0.01em; }
+h2 { font-family: var(--display); font-weight: 600; font-size: clamp(28px, 3.6vw, 40px); line-height: 1.15; margin-bottom: 14px; }
+h3 { font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+p { margin: 0; }
+.lead { font-size: clamp(18px, 2vw, 20px); color: var(--ink-2); max-width: 62ch; }
+.muted { color: var(--ink-3); }
+.small { font-size: 14px; color: var(--ink-3); }
+
+/* Header */
+.site-header { border-bottom: 1px solid var(--rule); background: var(--bg); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
+.site-header .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); text-decoration: none; font-size: 17px; }
+.brand-mark { width: 30px; height: 30px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 16px; font-weight: 700; }
+nav.main { display: flex; gap: 22px; flex-wrap: wrap; font-size: 15px; }
+nav.main a { color: var(--ink-2); text-decoration: none; }
+nav.main a:hover { color: var(--accent); }
+
+/* Buttons */
+.btn { display: inline-block; padding: 12px 22px; border-radius: 6px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1px solid var(--accent); cursor: pointer; font-family: var(--sans); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-secondary { background: transparent; color: var(--accent); }
+.btn-secondary:hover { background: #052b27; }
+.btn-ghost { background: transparent; color: var(--ink-2); border-color: var(--rule); }
+.btn-ghost:hover { border-color: var(--ink-3); color: var(--ink); }
+
+/* Hero */
+.hero { border-top: 0; padding-top: clamp(48px, 7vw, 88px); padding-bottom: clamp(56px, 7vw, 88px); }
+.hero-grid { display: grid; gap: 48px; align-items: center; }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.02fr 1fr; gap: 64px; } }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+.tagline { margin-top: 18px; font-size: 16px; color: var(--ink-3); }
+.hero .lead { margin-top: 20px; }
+
+/* Panels */
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; min-width: 0; }
+.panel-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.panel-top strong { font-size: 15px; }
+.badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--warn-bg); color: var(--warn); }
+.panel-body { padding: 18px; display: grid; gap: 14px; }
+
+/* Live checker */
+.checker-input {
+  width: 100%; min-height: 110px; resize: vertical; font: inherit; font-size: 16px; color: var(--ink);
+  background: var(--surface-2); border: 1px solid #3a3a41; border-radius: 8px; padding: 12px 14px;
+}
+.checker-input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.copy-block { background: var(--surface-2); border-radius: 8px; padding: 14px 16px; font-size: 16px; color: var(--ink); line-height: 1.7; min-height: 60px; }
+mark.flag { background: var(--flag-bg); color: #ffb4b4; border-bottom: 2px solid var(--flag); padding: 0 2px; border-radius: 3px; }
+mark.review { background: var(--warn-bg); color: #fde68a; border-bottom: 2px solid var(--warn); padding: 0 2px; border-radius: 3px; }
+.finding { border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; background: var(--surface-2); }
+.finding.flag { border-left-color: var(--flag); }
+.finding.review { border-left-color: var(--warn); }
+.finding .label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.finding .text { font-size: 15px; color: var(--ink); }
+.finding .src { font-size: 13px; color: var(--ink-3); }
+.suggest { border: 1px solid #1f5e54; background: #04201d; border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
+.suggest .label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.suggest .text { font-size: 16px; color: var(--ink); }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.note { font-size: 13px; color: var(--ink-3); }
+.empty { font-size: 15px; color: var(--ok); }
+
+/* Trust band */
+.trust { display: grid; gap: 28px; }
+@media (min-width: 900px) { .trust { grid-template-columns: repeat(3, 1fr); } }
+.trust-item { border-top: 2px solid var(--accent); padding-top: 16px; }
+.trust-item p { margin-top: 6px; color: var(--ink-2); font-size: 16px; }
+
+/* Process */
+.process { display: grid; gap: 0; margin-top: 40px; border-top: 1px solid var(--rule); }
+.process-row { display: grid; gap: 8px; padding: 22px 0; border-bottom: 1px solid var(--rule); }
+@media (min-width: 900px) { .process-row { grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; } }
+.process-row .step-name { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; }
+.process-row p { color: var(--ink-2); font-size: 17px; }
+.quote-line { margin-top: 32px; font-family: var(--display); font-size: clamp(22px, 2.8vw, 28px); font-weight: 600; color: var(--ink); }
+
+/* Features */
+.features { display: grid; gap: 0; margin-top: 40px; grid-template-columns: 1fr; border-top: 1px solid var(--rule); }
+@media (min-width: 720px) { .features { grid-template-columns: 1fr 1fr; column-gap: 48px; } }
+.feature { padding: 26px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 8px; align-content: start; min-width: 0; }
+.feature p { color: var(--ink-2); font-size: 16px; }
+.status { justify-self: start; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warn); background: var(--warn-bg); padding: 3px 9px; border-radius: 4px; }
+
+/* Principles and metrics */
+.principles { display: grid; gap: 18px; margin-top: 28px; }
+@media (min-width: 720px) { .principles { grid-template-columns: 1fr 1fr; } }
+.principle { display: grid; gap: 6px; padding: 22px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.principle p { color: var(--ink-2); font-size: 16px; }
+.metrics { display: grid; gap: 16px; margin-top: 28px; }
+@media (min-width: 900px) { .metrics { grid-template-columns: repeat(3, 1fr); } }
+.metric { padding: 20px; border-radius: 8px; background: var(--surface); border: 1px solid var(--rule); }
+.metric p { color: var(--ink-2); font-size: 16px; margin-top: 4px; }
+
+/* Status */
+.tbl-wrap { overflow-x: auto; margin-top: 24px; }
+.status-table { width: 100%; border-collapse: collapse; font-size: 16px; }
+.status-table th, .status-table td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--rule); }
+.status-table th { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 700; }
+.status-table td:last-child { white-space: nowrap; }
+.pill { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.pill.done { background: #052e22; color: var(--ok); }
+.pill.todo { background: #1a1a1f; color: var(--ink-3); }
+
+/* Contact */
+.contact-grid { display: grid; gap: 40px; }
+@media (min-width: 900px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 72px; } }
+form.contact { display: grid; gap: 14px; }
+label { display: grid; gap: 6px; font-size: 15px; font-weight: 600; color: var(--ink-2); }
+input, textarea {
+  font: inherit; font-size: 16px; color: var(--ink); background: var(--surface-2);
+  border: 1px solid #3a3a41; border-radius: 6px; padding: 11px 12px; width: 100%; min-width: 0;
+}
+input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.form-msg { font-size: 15px; color: var(--ink-2); min-height: 1.5em; }
+.form-msg.ok { color: var(--ok); }
+.form-msg.err { color: var(--flag); }
+[hidden] { display: none !important; }
+
+footer.site-footer { border-top: 1px solid var(--rule); padding-block: 28px; font-size: 14px; color: var(--ink-3); }
+footer.site-footer .container { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">✓</span>TrustAI BrandGuard</a>
+    <nav class="main" aria-label="Main">
+      <a href="#check">Live check</a>
+      <a href="#how">How it works</a>
+      <a href="#features">Capabilities</a>
+      <a href="#status">Status</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero" style="border-top:0">
+  <div class="container hero-grid">
+    <div>
+      <p class="kicker">Explainable AI for brand governance</p>
+      <h1>Protect your brand before you publish.</h1>
+      <p class="lead">TrustAI BrandGuard reviews content before it goes live. It checks drafts against your approved guidelines, facts and visuals, explains each issue with its source, and leaves the final decision to your people.</p>
+      <p class="tagline">Every content. Every claim. Every brand, trusted.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#check">Try the live check</a>
+        <a class="btn btn-secondary" href="#contact">Request early access</a>
+      </div>
+    </div>
+    <div class="panel" aria-label="Example of a flagged advertisement">
+      <div class="panel-top"><strong>Example review</strong><span class="badge">Fictional</span></div>
+      <div class="panel-body">
+        <div class="copy-block">Introducing our new <mark class="flag">cheap</mark> phone with a <mark class="flag">300 MP</mark> camera.</div>
+        <div class="finding flag"><span class="label">Fact mismatch</span><span class="text">The ad states 300 MP. The approved product sheet states 50 MP.</span><span class="src">Source: product sheet, camera section (fictional)</span></div>
+        <div class="finding flag"><span class="label">Unsupported claim</span><span class="text">"Cheap" is a price claim with no evidence on file.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="check" aria-labelledby="check-title">
+  <div class="container">
+    <p class="kicker">Live check</p>
+    <h2 id="check-title">Type a claim. See what gets flagged.</h2>
+    <p class="lead">This demo uses a few fixed rules and a sample product sheet that lists a 50 MP camera. It is not the full review engine, which will check against your own approved sources.</p>
+
+    <div class="panel" style="margin-top:32px">
+      <div class="panel-top"><strong>Ad copy</strong><span class="badge">Demo rules only</span></div>
+      <div class="panel-body">
+        <label for="input" style="font-size:14px">Paste or edit ad copy
+          <textarea id="input" class="checker-input" rows="3" spellcheck="false">Introducing our new cheap phone with a 300 MP camera. India's No. 1 smartphone!</textarea>
+        </label>
+        <div class="copy-block" id="highlighted" aria-live="polite"></div>
+        <div id="findings" style="display:grid;gap:10px"></div>
+        <div class="suggest" id="suggest-box" hidden>
+          <span class="label">Suggested revision</span>
+          <span class="text" id="suggest-text"></span>
+          <span class="note">Suggestions are for a person to review. Nothing is published automatically.</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="button" id="accept" hidden>Accept suggestion</button>
+          <button class="btn btn-ghost" type="button" id="reset">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container trust">
+    <div class="trust-item"><h3>Every finding has a source</h3><p>Each flag points to the guideline, fact or asset it came from, so reviewers can check it quickly.</p></div>
+    <div class="trust-item"><h3>Humans make the call</h3><p>Unsupported claims go to review. Publication decisions stay with authorised people.</p></div>
+    <div class="trust-item"><h3>Built for review teams</h3><p>Comments, approvals and version history keep a clear record of every change.</p></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <p class="kicker">How it works</p>
+    <h2>From draft to confident approval.</h2>
+    <p class="lead">Five stages, in order. The system recommends, and a person decides.</p>
+    <div class="process">
+      <div class="process-row"><span class="step-name">1. Import</span><p>Add brand guidelines, approved facts, terminology and reusable assets.</p></div>
+      <div class="process-row"><span class="step-name">2. Upload</span><p>Submit text, images, advertisements or documents for review.</p></div>
+      <div class="process-row"><span class="step-name">3. Analyse</span><p>Check tone, claims, facts, visuals, messaging and accessibility against your rules.</p></div>
+      <div class="process-row"><span class="step-name">4. Improve</span><p>Each issue is explained, with a suggested correction and its supporting reference.</p></div>
+      <div class="process-row"><span class="step-name">5. Approve</span><p>A reviewer approves the content or requests changes.</p></div>
+    </div>
+    <p class="quote-line">AI recommends. Humans decide.</p>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <p class="kicker">Capabilities</p>
+    <h2>More than a spellchecker. A governance system.</h2>
+    <p class="lead">Each capability below is planned for the first version. None are built yet.</p>
+    <div class="features">
+      <div class="feature"><span class="status">Planned</span><h3>Source library</h3><p>Store guidelines, approved facts and reusable assets in one place.</p></div>
+      <div class="feature"><span class="status">Planned</span><h3>Claim checking</h3><p>Compare statements with approved sources and flag unsupported claims.</p></div>
+      <div class="feature"><span class="status">Planned</span><h3>Tone and consistency</h3><p>Check terminology, tone and key messages against your brand rules.</p></div>
+      <div class="feature"><span class="status">Planned</span><h3>Visual and accessibility checks</h3><p>Review logos, colours and accessibility basics against your guidance.</p></div>
+      <div class="feature"><span class="status">Planned</span><h3>Explainable findings</h3><p>Every issue shows its reason, its source and a suggested fix.</p></div>
+      <div class="feature"><span class="status">Planned</span><h3>Governance and audit</h3><p>Comments, approvals, version history and governance insights.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <p class="kicker">Responsible AI</p>
+    <h2>Trustworthy automation. Human-controlled decisions.</h2>
+    <div class="principles">
+      <div class="principle"><h3>Clear reasons</h3><p>Findings include an understandable reason and a source reference.</p></div>
+      <div class="principle"><h3>Review, not verdicts</h3><p>Unsupported claims are flagged for review and are not automatically declared false.</p></div>
+      <div class="principle"><h3>Protected material</h3><p>Confidential content gets access controls and protected storage.</p></div>
+      <div class="principle"><h3>Disclosed AI use</h3><p>External AI use is disclosed, and an audit history records revisions and approvals.</p></div>
+    </div>
+    <h3 style="margin-top:44px">How we will measure it</h3>
+    <p class="muted" style="margin-top:6px">These metrics will be measured during testing. No results exist yet.</p>
+    <div class="metrics">
+      <div class="metric"><h3>Issues found</h3><p>Known issues correctly identified in a test set.</p></div>
+      <div class="metric"><h3>Review time</h3><p>Time to review and correct sample content.</p></div>
+      <div class="metric"><h3>Reviewer rating</h3><p>Whether reviewers find the findings clear and useful.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <div class="container">
+    <p class="kicker">Project status</p>
+    <h2>Where we are today.</h2>
+    <p class="lead">We are at the plan stage. The table shows what is complete and what is still ahead.</p>
+    <div class="tbl-wrap">
+      <table class="status-table">
+        <thead><tr><th scope="col">Workstream</th><th scope="col">Status</th></tr></thead>
+        <tbody>
+          <tr><td>Problem definition and target users</td><td><span class="pill done">Complete</span></td></tr>
+          <tr><td>User research: interviews, survey, testing</td><td><span class="pill todo">Proposed</span></td></tr>
+          <tr><td>Working prototype</td><td><span class="pill todo">Not started</span></td></tr>
+          <tr><td>Evaluation against test sets</td><td><span class="pill todo">Not started</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container contact-grid">
+    <div>
+      <p class="kicker">Contact</p>
+      <h2>Request early access.</h2>
+      <p class="lead">Tell us about your team and the content you review. We will respond about access and next steps.</p>
+      <p class="small" style="margin-top:20px">Your details are used only to respond to this request.</p>
+    </div>
+    <form class="contact" id="contact-form" novalidate>
+      <label>Name <input id="f-name" type="text" autocomplete="name" required></label>
+      <label>Work email <input id="f-email" type="email" autocomplete="email" required></label>
+      <label>Organisation <input id="f-org" type="text" autocomplete="organization"></label>
+      <label>What would you like to review? <textarea id="f-msg" rows="4"></textarea></label>
+      <button class="btn btn-primary" type="submit" style="justify-self:start">Request access</button>
+      <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>TrustAI BrandGuard · Round 1, the plan</span>
+    <span>Every content. Every claim. Every brand, trusted.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Demo sample product sheet. Only the camera value is checked here.
+  var SHEET_CAMERA_MP = 50;
+  var SAMPLE = "Introducing our new cheap phone with a 300 MP camera. India's No. 1 smartphone!";
+
+  var input = document.getElementById("input");
+  var highlighted = document.getElementById("highlighted");
+  var findingsEl = document.getElementById("findings");
+  var suggestBox = document.getElementById("suggest-box");
+  var suggestText = document.getElementById("suggest-text");
+  var acceptBtn = document.getElementById("accept");
+  var resetBtn = document.getElementById("reset");
+
+  // Each rule finds a span. replacement: string = fix it, "" = remove it, null = keep, flag for review.
+  var RULES = [
+    { re: /\b(\d+(?:\.\d+)?)\s*MP\b/gi, kind: "flag", label: "Fact mismatch",
+      test: function (m) { return parseFloat(m[1]) !== SHEET_CAMERA_MP; },
+      replacement: SHEET_CAMERA_MP + " MP",
+      reason: "The approved product sheet lists a " + SHEET_CAMERA_MP + " MP camera.",
+      src: "Source: product sheet, camera section (fictional)" },
+    { re: /\bcheap(est)?\b/gi, kind: "flag", label: "Unsupported claim",
+      test: function () { return true; }, replacement: "",
+      reason: "Price claim with no evidence on file. Removed in the suggestion. Add evidence to keep it.",
+      src: "" },
+    { re: /\b(No\.?\s?1|number one|most trusted|best)\b/gi, kind: "review", label: "Claim needs evidence",
+      test: function () { return true; }, replacement: null,
+      reason: "Superlative with no supporting evidence on file. Flagged for a person to review.",
+      src: "" }
+  ];
+
+  function collect(text) {
+    var hits = [];
+    RULES.forEach(function (rule) {
+      rule.re.lastIndex = 0;
+      var m;
+      while ((m = rule.re.exec(text)) !== null) {
+        if (rule.test(m)) {
+          hits.push({ start: m.index, end: m.index + m[0].length, text: m[0], rule: rule });
+        }
+      }
+    });
+    hits.sort(function (a, b) { return a.start - b.start; });
+    // Drop overlaps, keeping the earlier hit.
+    var out = [], last = -1;
+    hits.forEach(function (h) { if (h.start >= last) { out.push(h); last = h.end; } });
+    return out;
+  }
+
+  function buildSuggestion(text, hits) {
+    var result = "", pos = 0;
+    hits.forEach(function (h) {
+      result += text.slice(pos, h.start);
+      if (h.rule.replacement === null) result += h.text;
+      else result += h.rule.replacement;
+      pos = h.end;
+    });
+    result += text.slice(pos);
+    return result.replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1").trim();
+  }
+
+  function render() {
+    var text = input.value;
+    var hits = collect(text);
+
+    // Highlighted copy, built with text nodes (no innerHTML from user input).
+    while (highlighted.firstChild) highlighted.removeChild(highlighted.firstChild);
+    var pos = 0;
+    hits.forEach(function (h) {
+      if (h.start > pos) highlighted.appendChild(document.createTextNode(text.slice(pos, h.start)));
+      var mark = document.createElement("mark");
+      mark.className = h.rule.kind === "flag" ? "flag" : "review";
+      mark.textContent = h.text;
+      highlighted.appendChild(mark);
+      pos = h.end;
+    });
+    if (pos < text.length) highlighted.appendChild(document.createTextNode(text.slice(pos)));
+    if (!text) highlighted.appendChild(document.createTextNode("Nothing to check yet."));
+
+    // Findings list.
+    while (findingsEl.firstChild) findingsEl.removeChild(findingsEl.firstChild);
+    if (hits.length === 0 && text.trim()) {
+      var ok = document.createElement("p");
+      ok.className = "empty";
+      ok.textContent = "No issues found by these demo rules.";
+      findingsEl.appendChild(ok);
+    }
+    hits.forEach(function (h) {
+      var card = document.createElement("div");
+      card.className = "finding " + (h.rule.kind === "flag" ? "flag" : "review");
+      var lab = document.createElement("span"); lab.className = "label"; lab.textContent = h.rule.label;
+      var tx = document.createElement("span"); tx.className = "text";
+      tx.textContent = '"' + h.text + '": ' + h.rule.reason;
+      card.appendChild(lab); card.appendChild(tx);
+      if (h.rule.src) {
+        var s = document.createElement("span"); s.className = "src"; s.textContent = h.rule.src;
+        card.appendChild(s);
+      }
+      findingsEl.appendChild(card);
+    });
+
+    // Suggestion, shown only when something would change.
+    var suggestion = buildSuggestion(text, hits);
+    var changes = hits.some(function (h) { return h.rule.replacement !== null; });
+    suggestBox.hidden = !(changes && hits.length);
+    acceptBtn.hidden = suggestBox.hidden;
+    suggestText.textContent = suggestion;
+    acceptBtn.dataset.value = suggestion;
+  }
+
+  input.addEventListener("input", render);
+  acceptBtn.addEventListener("click", function () {
+    input.value = acceptBtn.dataset.value || input.value;
+    render();
+  });
+  resetBtn.addEventListener("click", function () {
+    input.value = SAMPLE;
+    render();
+  });
+  render();
+
+  // Contact form: validates locally. It does not send anything yet.
+  var form = document.getElementById("contact-form");
+  var msg = document.getElementById("form-msg");
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = document.getElementById("f-name").value.trim();
+    var email = document.getElementById("f-email").value.trim();
+    var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!name || !valid) {
+      msg.className = "form-msg err";
+      msg.textContent = !name ? "Please enter your name." : "Please enter a valid work email address.";
+      return;
+    }
+    msg.className = "form-msg ok";
+    msg.textContent = "Thanks, " + name + ". This preview does not send requests yet, so your message was not delivered.";
+    form.reset();
+  });
+})();
+</script>
+
+</body>
+</html>
